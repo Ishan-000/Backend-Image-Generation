@@ -102,7 +102,6 @@ All endpoints except `/api/auth/login` require authentication via JWT token.
 
 - Webhook Trigger: A POST request to a configured webhook URL with the processing status.
 - Webhook Security: Each request is signed using HMAC with the secret provided in the .env file. The receiving service should verify the signature for security.
-Customization
 
 ## Using the Postman Collection
 
