@@ -66,26 +66,21 @@ For a visual representation, see `docs/system-diagram.mermaid`.
 
 1. Create a `.env` file in the root directory with the following variables:
    ```
- # Server Configuration
 PORT=3000
 
-# Database Configuration
 DB_USER=your_db_user
 DB_HOST=localhost
 DB_NAME=your_db_name
 DB_PASSWORD=your_db_password
 DB_PORT=5432
 
-# AWS S3 Configuration
 AWS_ACCESS_KEY_ID=your_aws_access_key_id
 AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
 AWS_REGION=your_aws_region
 S3_BUCKET=your_s3_bucket_name
 
-# JWT Secret
 JWT_SECRET=your_jwt_secret
 
-# Webhook Secret
 WEBHOOK_SECRET=your_webhook_secret
 
    ```
