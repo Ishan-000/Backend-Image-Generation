@@ -54,10 +54,7 @@ For a visual representation, see `docs/system-diagram.mermaid`.
 
 ### Installation
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/yourusername/image-processing-system.git
-   ```
+1. Clone the repository
 
 2. Install dependencies:
    ```
