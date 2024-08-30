@@ -22,7 +22,7 @@ exports.processRequest = async (requestId) => {
   await generateOutputCSV(requestId);
 };
 
-async function processImage(image) {
+async function processImage(image, retryCount = 3) {
   try {
     const response = await axios.get(image.input_url, { responseType: 'arraybuffer' });
     const compressedImage = await sharp(response.data)
@@ -36,13 +36,19 @@ async function processImage(image) {
     await db.query('UPDATE images SET output_url = $1, status = $2, updated_at = $3 WHERE id = $4', 
       [outputUrl, 'PROCESSED', new Date(), image.id]);
   } catch (error) {
-    logger.error(`Error processing image ${image.id}: ${error.message}`);
-    await db.query('UPDATE images SET status = $1, updated_at = $2 WHERE id = $3', 
-      ['ERROR', new Date(), image.id]);
+    if (retryCount > 0) {
+      logger.warn(`Retrying image ${image.id} processing. Attempts remaining: ${retryCount}`);
+      await processImage(image, retryCount - 1);
+    } else {
+      logger.error(`Failed to process image ${image.id} after retries: ${error.message}`);
+      await db.query('UPDATE images SET status = $1, updated_at = $2 WHERE id = $3', 
+        ['ERROR', new Date(), image.id]);
+    }
   }
 }
 
-async function generateOutputCSV(requestId) {
+
+async function generateOutputCSV(requestId, options = { delimiter: ',', includeHeaders: true }) {
   const data = await db.query(`
     SELECT p.serial_number as "S. No.", p.name as "Product Name", 
            string_agg(i.input_url, ',') as "Input Image Urls",
@@ -58,7 +64,7 @@ async function generateOutputCSV(requestId) {
   const outputPath = `output/${requestId}.csv`;
 
   return new Promise((resolve, reject) => {
-    csv.stringify(data.rows, { header: true }, (err, output) => {
+    csv.stringify(data.rows, { header: options.includeHeaders, delimiter: options.delimiter }, (err, output) => {
       if (err) {
         logger.error(`Error generating output CSV: ${err.message}`);
         reject(err);
