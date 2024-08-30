@@ -9,21 +9,30 @@ exports.createRequest = async (requestId, filePath) => {
       [requestId, 'PENDING', new Date()]);
 
     const csvData = await require('./csvValidator').validate(filePath);
-    for (const row of csvData) {
-      const productResult = await client.query(
-        'INSERT INTO products (request_id, serial_number, name, created_at) VALUES ($1, $2, $3, $4) RETURNING id',
-        [requestId, row['S. No.'], row['Product Name'], new Date()]
-      );
-      const productId = productResult.rows[0].id;
+    const productInserts = [];
+    const imageInserts = [];
 
-      const urls = row['Input Image Urls'].split(',');
-      for (const url of urls) {
-        await client.query(
-          'INSERT INTO images (product_id, input_url, status, created_at, updated_at) VALUES ($1, $2, $3, $4, $4)',
-          [productId, url.trim(), 'PENDING', new Date()]
-        );
-      }
+    for (const row of csvData) {
+      productInserts.push({
+        text: 'INSERT INTO products (request_id, serial_number, name, created_at) VALUES ($1, $2, $3, $4) RETURNING id',
+        values: [requestId, row['S. No.'], row['Product Name'], new Date()]
+      });
     }
+
+    const productResults = await Promise.all(productInserts.map(query => client.query(query.text, query.values)));
+
+    productResults.forEach((result, index) => {
+      const productId = result.rows[0].id;
+      const urls = csvData[index]['Input Image Urls'].split(',');
+      urls.forEach(url => {
+        imageInserts.push({
+          text: 'INSERT INTO images (product_id, input_url, status, created_at, updated_at) VALUES ($1, $2, $3, $4, $4)',
+          values: [productId, url.trim(), 'PENDING', new Date()]
+        });
+      });
+    });
+
+    await Promise.all(imageInserts.map(query => client.query(query.text, query.values)));
 
     await client.query('COMMIT');
   } catch (error) {
@@ -34,6 +43,7 @@ exports.createRequest = async (requestId, filePath) => {
     client.release();
   }
 };
+
 
 exports.getRequestStatus = async (requestId) => {
   const result = await db.query(`
