@@ -54,7 +54,7 @@ For a visual representation, see `docs/system-diagram.mermaid`.
 
 ### Installation
 
-1. Clone the repository
+1. Clone the repo
 
 2. Install dependencies:
    ```
@@ -66,27 +66,22 @@ For a visual representation, see `docs/system-diagram.mermaid`.
 
 1. Create a `.env` file in the root directory with the following variables:
    ```
- # Server Configuration
-PORT=3000
+   PORT=3000
 
-# Database Configuration
-DB_USER=your_db_user
-DB_HOST=localhost
-DB_NAME=your_db_name
-DB_PASSWORD=your_db_password
-DB_PORT=5432
+   DB_USER=your_db_user
+   DB_HOST=localhost
+   DB_NAME=your_db_name
+   DB_PASSWORD=your_db_password
+   DB_PORT=5432
 
-# AWS S3 Configuration
-AWS_ACCESS_KEY_ID=your_aws_access_key_id
-AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
-AWS_REGION=your_aws_region
-S3_BUCKET=your_s3_bucket_name
+   AWS_ACCESS_KEY_ID=your_aws_access_key_id
+   AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
+   AWS_REGION=your_aws_region   
+   S3_BUCKET=your_s3_bucket_name
 
-# JWT Secret
-JWT_SECRET=your_jwt_secret
+   JWT_SECRET=your_jwt_secret
 
-# Webhook Secret
-WEBHOOK_SECRET=your_webhook_secret
+   WEBHOOK_SECRET=your_webhook_secret
 
    ```
 
@@ -102,6 +97,11 @@ Key endpoints:
 - GET `/api/status/:requestId`: Check the status of a processing request
 
 All endpoints except `/api/auth/login` require authentication via JWT token.
+
+## Webhook Integration
+
+- Webhook Trigger: A POST request to a configured webhook URL with the processing status.
+- Webhook Security: Each request is signed using HMAC with the secret provided in the .env file. The receiving service should verify the signature for security.
 
 ## Using the Postman Collection
 
