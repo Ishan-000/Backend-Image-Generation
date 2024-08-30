@@ -39,19 +39,19 @@ The system follows a modular architecture with the following key components:
 
 ```sql
 CREATE TABLE requests (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     status VARCHAR(20) NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    webhook_url TEXT
 );
 
 CREATE TABLE products (
     id SERIAL PRIMARY KEY,
-    request_id INTEGER NOT NULL REFERENCES requests(id),
+    request_id UUID NOT NULL REFERENCES requests(id),
     serial_number INTEGER NOT NULL,
     name VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE images (
@@ -59,10 +59,21 @@ CREATE TABLE images (
     product_id INTEGER NOT NULL REFERENCES products(id),
     input_url TEXT NOT NULL,
     output_url TEXT,
-    processing_status VARCHAR(20) NOT NULL DEFAULT 'pending',
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
 );
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL
+);
+
+--sample
+INSERT INTO users (username, password, created_at)
+VALUES ('ishan', '123456', NOW());
 
 CREATE TABLE webhooks (
     id SERIAL PRIMARY KEY,
