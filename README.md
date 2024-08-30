@@ -54,7 +54,7 @@ For a visual representation, see `docs/system-diagram.mermaid`.
 
 ### Installation
 
-1. Clone the repository
+1. Clone the repo
 
 2. Install dependencies:
    ```
@@ -97,6 +97,12 @@ Key endpoints:
 - GET `/api/status/:requestId`: Check the status of a processing request
 
 All endpoints except `/api/auth/login` require authentication via JWT token.
+
+## Webhook Integration
+
+Webhook Trigger: A POST request to a configured webhook URL with the processing status.
+Webhook Security: Each request is signed using HMAC with the secret provided in the .env file. The receiving service should verify the signature for security.
+Customization
 
 ## Using the Postman Collection
 
